@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ExchangeStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  name          String
+  email         String    @unique
+  password      String
+  role          Role      @default(USER)
+  creditBalance Int       @default(10) @map("credit_balance")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  skills              Skill[]
+  exchangesAsTeacher  Exchange[] @relation("TeacherExchanges")
+  exchangesAsLearner  Exchange[] @relation("LearnerExchanges")
+
+  @@map("users")
+}
+
+model Skill {
+  id          Int        @id @default(autoincrement())
+  title       String
+  category    String
+  level       SkillLevel
+  description String     @db.Text
+  duration    Int        // Duration in hours
+  credits     Int        // Credits required for this skill
+  ownerId     Int        @map("owner_id")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  // Relations
+  owner     User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  exchanges Exchange[]
+  reviews   Review[]
+
+  @@index([category])
+  @@index([level])
+  @@index([ownerId])
+  @@map("skills")
+}
+
+model Exchange {
+  id         Int            @id @default(autoincrement())
+  teacherId  Int            @map("teacher_id")
+  learnerId  Int            @map("learner_id")
+  skillId    Int            @map("skill_id")
+  duration   Int            // Duration in hours
+  credits    Int            // Credits transferred
+  status     ExchangeStatus @default(PENDING)
+  createdAt  DateTime       @default(now()) @map("created_at")
+  updatedAt  DateTime       @updatedAt @map("updated_at")
+
+  // Relations
+  teacher User   @relation("TeacherExchanges", fields: [teacherId], references: [id], onDelete: Cascade)
+  learner User   @relation("LearnerExchanges", fields: [learnerId], references: [id], onDelete: Cascade)
+  skill   Skill  @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  reviews Review[]
+
+  @@index([teacherId])
+  @@index([learnerId])
+  @@index([skillId])
+  @@index([status])
+  @@map("exchanges")
+}
+
+model Review {
+  id         Int      @id @default(autoincrement())
+  exchangeId Int      @map("exchange_id")
+  rating     Int      // 1-5 stars
+  comment    String?  @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relations
+  exchange Exchange @relation(fields: [exchangeId], references: [id], onDelete: Cascade)
+  skill    Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  skillId  Int      @map("skill_id")
+
+  @@index([exchangeId])
+  @@map("reviews")
+}
