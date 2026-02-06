@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: skillswap-api
+    env: node
+    plan: free
+    buildCommand: npm install && npx prisma generate
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: skillswap-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+
+databases:
+  - name: skillswap-db
+    plan: free
+    databaseName: skillswap
+    user: skillswap_user
