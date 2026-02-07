@@ -133,10 +133,11 @@ After seeding, you can login with these accounts:
 - Email: \`alice@example.com\` | Password: \`password123\`
 - Email: \`bob@example.com\` | Password: \`password123\`
 - Email: \`charlie@example.com\` | Password: \`password123\`
+```markdown
 
 ## 📁 Project Structure
 
-\`\`\`
+```text
 SkillSwap/
 ├── server/                 # Backend application
 │   ├── prisma/
@@ -163,7 +164,8 @@ SkillSwap/
 │   └── vite.config.js
 │
 └── README.md
-\`\`\`
+```
+```
 
 ## 🔌 API Endpoints
 
