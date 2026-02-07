@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+const getBaseURL = () => {
+    const url = import.meta.env.VITE_API_URL || 'https://indemnificatory-argentina-cushionless.ngrok-free.dev';
+    return url.endsWith('/api/v1') ? url : `${url}/api/v1`;
+};
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'https://indemnificatory-argentina-cushionless.ngrok-free.dev/api/v1',
+    baseURL: getBaseURL(),
     headers: {
         'Content-Type': 'application/json',
         'ngrok-skip-browser-warning': 'true'
